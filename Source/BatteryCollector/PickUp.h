@@ -33,6 +33,11 @@ public:
     //Allows other classes to safely change whether or not pickup is deactivated
     UFUNCTION(BlueprintCallable, Category = "Pickup")
     void SetActive(bool NewPickupState);
+
+    //Function to call when the pickup is collected
+    UFUNCTION(BlueprintNativeEvent)
+    void WasCollected();
+    virtual void WasCollected_Implementation();
 private:
     //Static Mesh to represent the pickup in the level
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))

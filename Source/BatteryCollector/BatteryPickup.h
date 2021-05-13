@@ -16,4 +16,7 @@ class BATTERYCOLLECTOR_API ABatteryPickup : public APickUp
 public:
     //Set default value
     ABatteryPickup();
+
+    //Override the WasCollected function - use Implementation because it's a Blueprint Native Event
+    virtual void WasCollected_Implementation() override;
 };
