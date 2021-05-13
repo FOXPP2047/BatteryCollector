@@ -3,6 +3,7 @@
 #include "BatteryCollectorGameMode.h"
 #include "BatteryCollectorCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -12,4 +13,18 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+    PrimaryActorTick.bCanEverTick = true;
+    //base deacy rate
+    DecayRate = 0.01f;
+}
+
+void ABatteryCollectorGameMode::Tick(float DeltaTime) {
+    Super::Tick(DeltaTime);
+    ABatteryCollectorCharacter* MyCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+
+    if (MyCharacter) {
+        if (MyCharacter->GetCurrentPower() > 0) {
+            MyCharacter->UpdatePower(-DeltaTime * DecayRate * MyCharacter->GetInitialPower());
+        }
+    }
 }

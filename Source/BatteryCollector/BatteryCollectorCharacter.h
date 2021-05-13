@@ -22,6 +22,22 @@ class ABatteryCollectorCharacter : public ACharacter
     /** Collection sphere */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickups", meta = (AllowPrivateAccess = "true"))
     class USphereComponent* CollectionSphere;
+
+    //Current lvel of our character
+    UPROPERTY(VisibleAnywhere, Category = "Power")
+    float CharacterPower;
+protected:
+    //The starting power level of our character
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+    float InitialPower;
+
+    //Multipier for character speed
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+    float SpeedFactor;
+
+    //Speed when power level = 0
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+    float BaseSpeed;
 public:
 	ABatteryCollectorCharacter();
 
@@ -70,11 +86,24 @@ protected:
     //Called when we press a key to collect any pickups inside the CollectionSphere
     UFUNCTION(BlueprintCallable, Category = "Pickups")
     void CollectPickups();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Power")
+    void PowerChangeEffect();
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
     FORCEINLINE class USphereComponent* GetCollectionSphere() const { return CollectionSphere; }
+
+    //Accessor function for initial power
+    UFUNCTION(BlueprintPure, Category = "Power")
+    float GetInitialPower();
+    //Accessor function for current power
+    UFUNCTION(BlueprintPure, Category = "Power")
+    float GetCurrentPower();
+    //Function to update the character's pwoer
+    UFUNCTION(BlueprintCallable, Category = "Power")
+    void UpdatePower(float PowerChange);
 };
 

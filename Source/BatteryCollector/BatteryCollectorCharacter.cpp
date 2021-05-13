@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
 #include "PickUp.h"
+#include "BatteryPickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
@@ -49,6 +50,15 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
     CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
     CollectionSphere->AttachTo(RootComponent);
     CollectionSphere->SetSphereRadius(200.f);
+
+    //Set a base power level for the cahracter
+    InitialPower = 2000.f;
+    CharacterPower = InitialPower;
+
+    //Set the dependence of the speed on the power level
+    SpeedFactor = 0.75f;
+    BaseSpeed = 10.0f;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -152,6 +162,9 @@ void ABatteryCollectorCharacter::CollectPickups() {
     TArray<AActor*> CollectedActors;
     CollectionSphere->GetOverlappingActors(CollectedActors);
     
+    //Keep track of the collected battery power
+    float CollectedPower = 0.f;
+
     // For each Actor we collected
     for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected) {
         // Cast the actor to APickup
@@ -160,10 +173,33 @@ void ABatteryCollectorCharacter::CollectPickups() {
         if (TestPickup && !TestPickup->IsPendingKill() && TestPickup->IsActive()) {
             // Call the PickUp's WasCollected function
             TestPickup->WasCollected();
+
+            ABatteryPickup* const TestBattery = Cast<ABatteryPickup>(TestPickup);
+            if (TestBattery) {
+                CollectedPower += TestBattery->GetPower();
+            }
+            
             // Deactivate the PickUp
             TestPickup->SetActive(false);
         }
     }
 
-        
+    if (CollectedPower > 0) {
+        UpdatePower(CollectedPower);
+    }
+}
+
+float ABatteryCollectorCharacter::GetInitialPower() {
+    return InitialPower; 
+}
+
+float ABatteryCollectorCharacter::GetCurrentPower() { 
+    return CharacterPower; 
+}
+
+void ABatteryCollectorCharacter::UpdatePower(float PowerChange) {
+    CharacterPower += PowerChange;
+
+    GetCharacterMovement()->MaxWalkSpeed = BaseSpeed + SpeedFactor * CharacterPower;
+    PowerChangeEffect();
 }
