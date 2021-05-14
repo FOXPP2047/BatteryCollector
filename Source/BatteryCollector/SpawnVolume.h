@@ -31,6 +31,10 @@ public:
     //Find a random point within the Boxcomponent
     UFUNCTION(BlueprintPure, Category = "Spawning")
     FVector GetRandomPointInVolume();
+
+    //This function toggles whether or not the spawn volume spawns pickups
+    UFUNCTION(BlueprintCallable, Category = "Spawning")
+    void SetSpawingActive(bool bShouldSpawn);
 private:
     //Box Component to specify where pickups should be spawned
     UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
